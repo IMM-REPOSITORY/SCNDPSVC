@@ -1,0 +1,83 @@
+# Repository Structure
+
+The repository contains the test instances, numerical results, and source code used in the computational experiments.
+
+## 1. Instances
+
+The `Instances` folder contains generated instances with four combinations of cluster density and edge failure probability type:
+
+* `correlated/dense`: instances with correlated edge failure probabilities and dense clusters;
+* `correlated/sparse`: instances with correlated edge failure probabilities and sparse clusters;
+* `random/dense`: instances with random edge failure probabilities and dense clusters;
+* `random/sparse`: instances with random edge failure probabilities and sparse clusters.
+
+The `input100v-stage1` subfolder contains the complete dataset of 640 instances. The `input100v-stage2,3` subfolder contains 320 instances selected for Stages II and III of the computational study.
+
+## 2. Results
+
+The `Results` folder contains the results of the numerical evaluation in `.xlsx` format.
+
+## 3. Sources
+
+The `Sources` folder contains the source code of AlgCut
+
+## Running an Experiment
+
+To run an experiment on a given instance, use the following command:
+
+```bash
+python run_experiments -e EXPERIMENT_MODE -o ORDER_MODE [-b BACKUP_DELTA] [-p EPSILON_THRESHOLD] [-l MIPSTART_FILENAME] INSTANCE_FILENAME
+```
+
+### Parameters
+
+#### `EXPERIMENT_MODE` - required
+
+Specifies the local cut-generation subproblems considered in the experiment:
+
+* `budget`: subproblems SB1 and SB2;
+* `gluing`: subproblem SC;
+* `local_common`: subproblems SCB1 and SCB2;
+* `common`: subproblems SP1 and SP2.
+
+#### `ORDER_MODE` - required
+
+Specifies the order in which the local cut-generation subproblems are considered during cut separation:
+
+* `budget`: SB1 and SB2 → SC → SCB1 and SCB2 → SP1 and SP2;
+* `gluing`: SC → SB1 and SB2 → SCB1 and SCB2 → SP1 and SP2;
+* `local_common`: SCB1 and SCB2 → SB1 and SB2 → SC → SP1 and SP2;
+* `common`: SP1 and SP2.
+
+If a subproblem is not included in `EXPERIMENT_MODE`, it is automatically omitted from the corresponding separation order.
+
+#### `BACKUP_DELTA` - optional
+
+The factor \(\delta\) used to compute \(L_2\) from \(L_1\) according to
+
+$$
+L_2 = \lceil \delta L_1 \rceil.
+$$
+
+The default value of `BACKUP_DELTA` is `1.1`.
+
+
+#### `EPSILON_THRESHOLD` - optional
+
+The resilience threshold (\varepsilon). The default value is `0.01`.
+
+#### `MIPSTART_FILENAME` - optional
+
+The name of a file containing a solution  that can be provided to AlgCut as MIP start. The default value is `None`.
+
+#### `INSTANCE_FILENAME` - required
+
+The name of the instance file to be processed.
+
+### Example
+
+For example, to run an experiment considering SB1 and SB2 followed by SC, use:
+
+```bash
+python run_experiments -e budget gluing -o budget INSTANCE_FILENAME
+```
